@@ -254,6 +254,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
+          // ignore: prefer_if_null_operators
           error == null
               ? 'User "$fullName" berhasil ${isActive ? "diaktifkan" : "dinonaktifkan"}'
               : error,
@@ -300,6 +301,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        // ignore: prefer_if_null_operators
         content: Text(error == null ? 'User "$fullName" berhasil dihapus' : error),
         backgroundColor: error == null ? Colors.green : Colors.red,
         behavior: SnackBarBehavior.floating,
