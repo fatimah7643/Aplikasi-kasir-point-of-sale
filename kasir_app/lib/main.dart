@@ -3,11 +3,12 @@ import 'package:provider/provider.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/product_provider.dart';
 import 'core/providers/transaction_provider.dart';
+import 'core/providers/admin_product_provider.dart';
 import 'core/services/api_service.dart';
 import 'features/auth/screens/login_screen.dart';
-import 'features/auth/screens/placeholder_screen.dart';
 import 'features/kasir/screens/kasir_screen.dart';
 import 'features/kasir/screens/checkout_screen.dart';
+import 'features/admin/screens/admin_screen.dart';
 
 void main() {
   ApiService.init();
@@ -17,6 +18,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProductProvider()),
       ],
       child: const MyApp(),
     ),
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (_) => const SplashRouter(),
         '/kasir': (_) => const KasirScreen(),
-        '/admin': (_) => const AdminPlaceholderScreen(),
+        '/admin': (_) => const AdminScreen(),
         '/checkout': (_) => const CheckoutScreen(),
       },
     );
