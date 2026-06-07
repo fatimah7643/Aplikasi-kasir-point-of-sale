@@ -5,6 +5,9 @@ import '../../../core/providers/admin_product_provider.dart';
 import '../widgets/product_admin_card.dart';
 import 'add_product_screen.dart';
 import 'edit_product_screen.dart';
+import 'user_management_screen.dart';
+import 'dashboard_screen.dart';
+import '../screens/profit_screen.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -15,6 +18,7 @@ class AdminScreen extends StatefulWidget {
 
 class _AdminScreenState extends State<AdminScreen> {
   final _searchController = TextEditingController();
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -80,8 +84,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           ? 'Stok berhasil ditambah $qty unit'
                           : 'Gagal menambah stok',
                     ),
-                    backgroundColor:
-                        success ? Colors.green : Colors.red,
+                    backgroundColor: success ? Colors.green : Colors.red,
                   ),
                 );
               }
@@ -202,6 +205,49 @@ class _AdminScreenState extends State<AdminScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() => _selectedIndex = index);
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DashboardScreen()),
+            ).then((_) => setState(() => _selectedIndex = 0));
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const UserManagementScreen()),
+            ).then((_) => setState(() => _selectedIndex = 0));
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfitScreen()),
+            ).then((_) => setState(() => _selectedIndex = 0));
+          }
+        },
+        selectedItemColor: Colors.blue.shade700,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2_rounded),
+            label: 'Produk',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_rounded),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_rounded),
+            label: 'Users',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Rekap Laba',
+          ), 
+        ],
+      ),
       body: Column(
         children: [
           // Search bar
@@ -219,21 +265,17 @@ class _AdminScreenState extends State<AdminScreen> {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
-                          context
-                              .read<AdminProductProvider>()
-                              .setSearch('');
+                          context.read<AdminProductProvider>().setSearch('');
                         },
                       )
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: Colors.black, width: 2),
+                  borderSide: const BorderSide(color: Colors.black, width: 2),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: Colors.black, width: 2),
+                  borderSide: const BorderSide(color: Colors.black, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 14,
@@ -251,8 +293,7 @@ class _AdminScreenState extends State<AdminScreen> {
           Consumer<AdminProductProvider>(
             builder: (_, provider, __) {
               final products = provider.filteredProducts;
-              final lowStock =
-                  products.where((p) => p.stock <= 5).length;
+              final lowStock = products.where((p) => p.stock <= 5).length;
               return Container(
                 color: Colors.blue.shade50,
                 padding: const EdgeInsets.symmetric(

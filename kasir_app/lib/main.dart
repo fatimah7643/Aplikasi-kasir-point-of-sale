@@ -9,6 +9,10 @@ import 'features/auth/screens/login_screen.dart';
 import 'features/kasir/screens/kasir_screen.dart';
 import 'features/kasir/screens/checkout_screen.dart';
 import 'features/admin/screens/admin_screen.dart';
+import 'core/providers/user_provider.dart';
+import 'core/providers/dashboard_provider.dart';
+import 'core/providers/profit_provider.dart';
+import 'features/admin/screens/profit_screen.dart';
 
 void main() {
   ApiService.init();
@@ -19,6 +23,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => AdminProductProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProvider(create: (_) => ProfitProvider()),
       ],
       child: const MyApp(),
     ),
@@ -42,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const SplashRouter(),
         '/kasir': (_) => const KasirScreen(),
         '/admin': (_) => const AdminScreen(),
+        '/profit': (_) => const ProfitScreen(),
         '/checkout': (_) => const CheckoutScreen(),
       },
     );

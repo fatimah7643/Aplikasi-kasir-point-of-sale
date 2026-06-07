@@ -12,6 +12,7 @@ const userRoutes = require('./routes/user.routes');
 const productRoutes = require('./routes/product.routes');
 const transactionRoutes = require('./routes/transaction.routes');
 const { errorResponse } = require('./utils/response');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -97,6 +98,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // =============================================
 // 404 HANDLER
