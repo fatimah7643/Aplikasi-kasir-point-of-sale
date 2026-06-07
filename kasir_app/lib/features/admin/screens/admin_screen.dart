@@ -8,6 +8,7 @@ import 'edit_product_screen.dart';
 import 'user_management_screen.dart';
 import 'dashboard_screen.dart';
 import '../screens/profit_screen.dart';
+import '../screens/export_screen.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -225,6 +226,11 @@ class _AdminScreenState extends State<AdminScreen> {
               context,
               MaterialPageRoute(builder: (_) => const ProfitScreen()),
             ).then((_) => setState(() => _selectedIndex = 0));
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ExportScreen()),
+            ).then((_) => setState(() => _selectedIndex = 0));
           }
         },
         selectedItemColor: Colors.blue.shade700,
@@ -245,6 +251,10 @@ class _AdminScreenState extends State<AdminScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart),
             label: 'Rekap Laba',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.file_download),
+            label: 'Ekspor Data',
           ), 
         ],
       ),

@@ -256,4 +256,102 @@ const getDailyProfit = async (req, res) => {
   }
 };
 
-module.exports = { getDashboardSummary, getWeeklyChart, getTopProducts, getDailyProfit, getProfitSummary };
+/**
+ * GET /api/dashboard/export/transactions
+ * Export transaksi ke CSV dengan filter tanggal
+ */
+const exportTransactionsCSV = async (req, res) => {
+  try {
+    const { date_from, date_to } = req.query;
+
+    const conditions = ["t.status = 'completed'"];
+    const params = [];
+    let paramCount = 1;
+
+    if (date_from) {
+      conditions.push(`DATE(t.created_at) >= $${paramCount++}`);
+      params.push(date_from);
+    }
+
+    if (date_to) {
+      conditions.push(`DATE(t.created_at) <= $${paramCount++}`);
+      params.push(date_to);
+    }
+
+    const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
+    const result = await query(`
+      SELECT
+        t.transaction_number                          AS "No. Transaksi",
+        TO_CHAR(t.created_at AT TIME ZONE 'Asia/Makassar', 'DD/MM/YYYY HH24:MI') AS "Tanggal",
+        u.full_name                                   AS "Kasir",
+        p.product_name                                AS "Nama Barang",
+        p.product_code                                AS "Kode Barang",
+        td.quantity                                   AS "Qty",
+        p.unit                                        AS "Satuan",
+        td.current_selling_price                      AS "Harga Jual",
+        p.cost_price                                  AS "Harga Modal",
+        td.subtotal                                   AS "Subtotal Jual",
+        (td.quantity * p.cost_price)                  AS "Subtotal Modal",
+        (td.subtotal - (td.quantity * p.cost_price))  AS "Laba Item",
+        t.discount                                    AS "Diskon",
+        t.grand_total                                 AS "Total Bayar",
+        t.payment_amount                              AS "Uang Bayar",
+        t.change_amount                               AS "Kembalian"
+      FROM transactions t
+      JOIN transaction_details td ON t.id = td.transaction_id
+      JOIN products p ON td.product_id = p.id
+      JOIN users u ON t.cashier_id = u.id
+      ${whereClause}
+      ORDER BY t.created_at DESC, p.product_name ASC
+    `, params);
+
+    if (result.rows.length === 0) {
+      return errorResponse(res, {
+        statusCode: 404,
+        message: 'Tidak ada data transaksi pada periode yang dipilih.'
+      });
+    }
+
+    // Generate CSV
+    const headers = Object.keys(result.rows[0]);
+    const csvRows = [
+      // Header baris info
+      `"LAPORAN TRANSAKSI KASIR APP"`,
+      `"Periode: ${date_from || 'Semua'} s/d ${date_to || 'Semua'}"`,
+      `"Diekspor: ${new Date().toLocaleDateString('id-ID')}"`,
+      `""`,
+      // Header kolom
+      headers.map(h => `"${h}"`).join(','),
+      // Data rows
+      ...result.rows.map(row =>
+        headers.map(h => {
+          const val = row[h];
+          if (val === null || val === undefined) return '""';
+          // Angka tidak perlu quotes
+          if (typeof val === 'number' || (!isNaN(val) && val !== '')) {
+            return val;
+          }
+          // String dengan escape quote
+          return `"${String(val).replace(/"/g, '""')}"`;
+        }).join(',')
+      )
+    ];
+
+    const csvContent = csvRows.join('\n');
+
+    // Set header response sebagai file download
+    const filename = `laporan-transaksi-${date_from || 'semua'}-sd-${date_to || 'semua'}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    // BOM untuk Excel agar karakter Indonesia terbaca
+    res.send('\uFEFF' + csvContent);
+
+  } catch (err) {
+    console.error('❌ exportTransactionsCSV Error:', err.message);
+    return errorResponse(res, { statusCode: 500, message: 'Gagal mengekspor data.' });
+  }
+};
+
+module.exports = { getDashboardSummary, getWeeklyChart, getTopProducts, getDailyProfit, getProfitSummary, exportTransactionsCSV };
