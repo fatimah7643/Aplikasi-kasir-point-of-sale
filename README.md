@@ -6,7 +6,7 @@ Aplikasi kasir berbasis mobile multi-user yang dirancang untuk mempermudah opera
 
 ## 📸 Tampilan Aplikasi
 
-### Panel Admin
+### Mockup aplikasi
 ![mockup](assets/mockup-app.png)
 
 
